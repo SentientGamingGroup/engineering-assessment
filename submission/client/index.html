@@ -1,27 +1,125 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Beacon Relay — Sentient assessment</title>
-  <link rel="stylesheet" href="/client/style.css">
-</head>
-<body>
-  <main>
-    <header><span class="brand">SENTIENT / ENGINEERING ASSESSMENT</span><span id="connection">Connecting</span></header>
-    <h1>Beacon Relay</h1><p>Choose a beacon. Follow the pulse. Reveal the signal.</p>
-    <section class="stage" aria-label="Beacon stage">
-      <div class="orbit"></div><div class="pulse" aria-hidden="true"></div>
-      <button class="beacon blue" data-choice="0" aria-pressed="true">01<span>Azure</span></button>
-      <button class="beacon gold" data-choice="1" aria-pressed="false">02<span>Amber</span></button>
-      <button class="beacon violet" data-choice="2" aria-pressed="false">03<span>Violet</span></button>
-    </section>
-    <div class="controls">
-      <button id="play">Play</button><button id="pause" disabled>Pause</button>
-      <button id="skip" disabled>Skip</button><button id="replay" disabled>Replay</button>
-      <button id="new" disabled>New Round</button>
-    </div>
-    <p id="result" role="status">Starter: implement round state, controls and animation.</p>
-    <footer>Demo score: <strong id="score">0</strong><span>No money or accounts</span></footer>
-  </main><script type="module" src="/client/app.mjs"></script>
-</body>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#0b101b" />
+    <meta
+      name="description"
+      content="Send a signal through three beacons in a fictional, server-authoritative mini-game."
+    />
+    <title>Beacon Relay</title>
+    <link rel="stylesheet" href="/client/style.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <a class="brand" href="/" aria-label="Beacon Relay home"
+          ><span class="brand-mark" aria-hidden="true">◈</span> SENTIENT
+          <span class="brand-divider">/</span> SIGNAL LAB</a
+        ><span id="connection" role="status">Connecting…</span>
+      </header>
+      <section class="intro">
+        <div>
+          <p class="eyebrow">EXPERIMENT 001 · INTERACTIVE RELAY</p>
+          <h1>Follow the <span>signal.</span></h1>
+          <p class="subtitle">
+            Three beacons. One destination. Choose yours and let the relay
+            decide.
+          </p>
+        </div>
+        <div class="score-card">
+          <span>DEMO POINTS</span><strong id="score">0</strong
+          ><small id="round-count">0 rounds completed</small>
+        </div>
+      </section>
+      <div class="stage-heading">
+        <span
+          ><span class="status-dot" aria-hidden="true"></span
+          ><span id="phase">Ready to relay</span></span
+        ><span class="selection-label"
+          >YOUR BEACON <strong id="selection">01 / Azure</strong></span
+        >
+      </div>
+      <section class="stage" aria-label="Beacon stage">
+        <div class="stage-grid" aria-hidden="true"></div>
+        <span class="stage-caption" aria-hidden="true"
+          >RELAY FIELD / 03 NODES</span
+        >
+        <svg
+          class="routes"
+          viewBox="0 0 1000 320"
+          preserveAspectRatio="none"
+          aria-hidden="true"
+        >
+          <path class="route selected" d="M500 64 C500 122 200 134 200 205" />
+          <path class="route" d="M500 64 C500 122 500 134 500 205" />
+          <path class="route" d="M500 64 C500 122 800 134 800 205" />
+        </svg>
+        <div class="source" aria-hidden="true">
+          <span>◈</span><small>SOURCE</small>
+        </div>
+        <div class="pulse" aria-hidden="true"></div>
+        <button
+          class="beacon blue"
+          data-choice="0"
+          aria-pressed="true"
+          aria-label="Choose beacon 01, Azure"
+        >
+          <span class="beacon-core">01</span
+          ><span class="beacon-name">Azure</span
+          ><span class="beacon-frequency">428 THz</span>
+        </button>
+        <button
+          class="beacon gold"
+          data-choice="1"
+          aria-pressed="false"
+          aria-label="Choose beacon 02, Amber"
+        >
+          <span class="beacon-core">02</span
+          ><span class="beacon-name">Amber</span
+          ><span class="beacon-frequency">516 THz</span>
+        </button>
+        <button
+          class="beacon violet"
+          data-choice="2"
+          aria-pressed="false"
+          aria-label="Choose beacon 03, Violet"
+        >
+          <span class="beacon-core">03</span
+          ><span class="beacon-name">Violet</span
+          ><span class="beacon-frequency">702 THz</span>
+        </button>
+        <span class="stage-footnote" aria-hidden="true"
+          >SELECT A NODE · SEND A SIGNAL · FIND YOUR MATCH</span
+        >
+      </section>
+      <div class="control-row">
+        <div class="controls" role="group" aria-label="Round controls">
+          <button id="play">Play round</button
+          ><button id="pause" disabled>Pause</button>
+          <button id="skip" disabled>Skip</button
+          ><button id="replay" disabled>Replay</button>
+          <button id="new" disabled>New Round</button>
+        </div>
+        <span class="keyboard-hint"
+          ><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> to choose</span
+        >
+      </div>
+      <div class="result-panel">
+        <span class="result-icon" aria-hidden="true">↗</span>
+        <p id="result" role="status" aria-live="polite">
+          Choose a beacon, then send your signal.
+        </p>
+      </div>
+      <p id="notice" role="status"></p>
+      <footer>
+        <span
+          >BEACON RELAY <span class="footer-divider">/</span> A SMALL EXPERIMENT
+          IN CHANCE</span
+        ><span>Fictional game · No money or accounts</span>
+      </footer>
+    </main>
+    <script type="module" src="/client/app.mjs"></script>
+  </body>
 </html>
