@@ -1,0 +1,14 @@
+:root{color-scheme:dark;font:16px system-ui,sans-serif;background:#10131d;color:#e6ecfa}
+*{box-sizing:border-box}body{margin:0;padding:28px;min-height:100vh}
+main{max-width:960px;margin:0 auto}header,footer{display:flex;justify-content:space-between;gap:16px}
+header{font-size:12px;letter-spacing:.06em;color:#aabbd4}.brand{color:#62d3c0}
+h1{font-size:clamp(32px,5vw,54px);margin:36px 0 8px}p{color:#b0bfd5}
+.stage{height:330px;position:relative;border:1px solid #303b52;border-radius:20px;margin:28px 0;overflow:hidden;background:radial-gradient(ellipse at center,#243047,#141924 70%)}
+.orbit{position:absolute;inset:20% 12%;border:1px dashed #49617d;border-radius:50%}
+.beacon{position:absolute;top:41%;width:86px;height:86px;border-radius:50%;padding:8px;color:#e9f1ff;font-size:22px;background:#152233;border:2px solid var(--accent)}
+.beacon span{display:block;font-size:12px;margin-top:4px}.blue{--accent:#5dc8ff;left:12%}.gold{--accent:#ffcf68;left:calc(50% - 43px)}.violet{--accent:#b896ff;right:12%}
+.beacon[aria-pressed=true]{box-shadow:0 0 0 5px #ffffff1a}.pulse{position:absolute;left:calc(50% - 8px);top:18%;width:16px;height:16px;border-radius:50%;background:#72eed8;box-shadow:0 0 20px #72eed8}
+.controls{display:flex;flex-wrap:wrap;gap:10px}button{font:inherit;color:inherit;background:#202c40;border:1px solid #40536e;border-radius:8px;padding:10px 16px;cursor:pointer}
+#play{background:#67dcc3;color:#10241f;border-color:#67dcc3}button:disabled{opacity:.4;cursor:default}button:focus-visible{outline:3px solid #fff;outline-offset:4px}
+footer{margin-top:30px;font-size:14px;color:#8ea2bd}footer span{font-size:12px}
+@media(max-width:500px){body{padding:18px}.stage{height:300px}.beacon{width:68px;height:68px;font-size:18px}.blue{left:5%}.gold{left:calc(50% - 34px)}.violet{right:5%}header{flex-wrap:wrap}footer{flex-wrap:wrap}}

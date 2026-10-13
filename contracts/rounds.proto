@@ -1,0 +1,26 @@
+syntax = "proto3";
+package assessment;
+service RoundService {
+  rpc Health(Empty) returns (HealthReply);
+  rpc StartRound(StartRoundRequest) returns (Round);
+  rpc GetRound(GetRoundRequest) returns (Round);
+  rpc ListEvents(ListEventsRequest) returns (EventPage);
+}
+message Empty {}
+message HealthReply { bool ok = 1; }
+message StartRoundRequest { string request_id = 1; string player_id = 2; uint32 choice = 3; }
+message GetRoundRequest { string round_id = 1; }
+message ListEventsRequest { uint32 after = 1; uint32 limit = 2; }
+message Round {
+  string round_id = 1;
+  string request_id = 2;
+  string player_id = 3;
+  uint32 choice = 4;
+  string status = 5;
+  string created_at = 6;
+  optional uint32 target = 7;
+  optional uint32 score = 8;
+  optional string completed_at = 9;
+}
+message Event { uint32 sequence = 1; string type = 2; Round round = 3; }
+message EventPage { repeated Event events = 1; uint32 next_cursor = 2; }

@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Beacon Relay — Sentient assessment</title>
+  <link rel="stylesheet" href="/client/style.css">
+</head>
+<body>
+  <main>
+    <header><span class="brand">SENTIENT / ENGINEERING ASSESSMENT</span><span id="connection">Connecting</span></header>
+    <h1>Beacon Relay</h1><p>Choose a beacon. Follow the pulse. Reveal the signal.</p>
+    <section class="stage" aria-label="Beacon stage">
+      <div class="orbit"></div><div class="pulse" aria-hidden="true"></div>
+      <button class="beacon blue" data-choice="0" aria-pressed="true">01<span>Azure</span></button>
+      <button class="beacon gold" data-choice="1" aria-pressed="false">02<span>Amber</span></button>
+      <button class="beacon violet" data-choice="2" aria-pressed="false">03<span>Violet</span></button>
+    </section>
+    <div class="controls">
+      <button id="play">Play</button><button id="pause" disabled>Pause</button>
+      <button id="skip" disabled>Skip</button><button id="replay" disabled>Replay</button>
+      <button id="new" disabled>New Round</button>
+    </div>
+    <p id="result" role="status">Starter: implement round state, controls and animation.</p>
+    <footer>Demo score: <strong id="score">0</strong><span>No money or accounts</span></footer>
+  </main><script type="module" src="/client/app.mjs"></script>
+</body>
+</html>

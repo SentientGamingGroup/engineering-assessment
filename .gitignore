@@ -1,0 +1,9 @@
+data/
+node_modules/
+submission/build/
+submission/*.exe
+*.log
+.DS_Store
+.env
+.env.*
+coverage/
