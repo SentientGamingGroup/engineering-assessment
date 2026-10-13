@@ -1,0 +1,11 @@
+{
+  "name": "beacon-relay-validation",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:browser": "node browser-test.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.64.0"
+  }
+}
