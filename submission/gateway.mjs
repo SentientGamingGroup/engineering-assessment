@@ -8,6 +8,7 @@ const assets = new Map([
   ['/', ['index.html', 'text/html']],
   ['/client/app.mjs', ['app.mjs', 'text/javascript']],
   ['/client/style.css', ['style.css', 'text/css']],
+  ['/client/timeline.mjs', ['timeline.mjs', 'text/javascript']],
 ]);
 const reply = (res, status, body) => {
   res.writeHead(status, { 'Content-Type': 'application/json' });
