@@ -1,0 +1,26 @@
+{
+  "generatedAt": "2026-10-13T07:27:04.456Z",
+  "browser": "Chromium 154.0.8037.58",
+  "platform": "win32",
+  "headless": true,
+  "viewports": [
+    "1280×720 DPR 1",
+    "390×844 DPR 2"
+  ],
+  "checks": [
+    "1280×720 selection and layout",
+    "simulated visibility changes stop and resume presentation without a second loop",
+    "keyboard play, 20 rapid clicks, pause/resume, and authoritative reveal",
+    "replay/skip have no server writes; New Round preserves score",
+    "refresh during pending round preserves identity and score",
+    "paused presentation does not pause the server; Skip reveals completed result",
+    "Skip before completion waits for the actual result",
+    "offline submission retries the original request identity",
+    "connection loss during animation preserves the recorded outcome",
+    "abrupt server restart recovers the browser round without another acceptance",
+    "a delayed accepted HTTP reply cannot replace a newer round",
+    "390×844 at DPR 2: no clipped beacons, touch controls, reduced motion",
+    "no uncaught browser errors"
+  ],
+  "errors": []
+}
