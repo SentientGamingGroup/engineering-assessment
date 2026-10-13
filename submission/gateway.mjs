@@ -7,7 +7,15 @@ import { attachStream } from './stream.mjs';
 const assets = new Map([
   ['/', ['index.html', 'text/html']],
   ['/client/app.mjs', ['app.mjs', 'text/javascript']],
+  ['/client/state.mjs', ['state.mjs', 'text/javascript']],
+  ['/client/timeline.mjs', ['timeline.mjs', 'text/javascript']],
+  ['/client/fx.mjs', ['fx.mjs', 'text/javascript']],
   ['/client/style.css', ['style.css', 'text/css']],
+  ['/client/icon.svg', ['icon.svg', 'image/svg+xml']],
+  ['/client/fonts/poppins-400.woff2', ['fonts/poppins-400.woff2', 'font/woff2']],
+  ['/client/fonts/poppins-500.woff2', ['fonts/poppins-500.woff2', 'font/woff2']],
+  ['/client/fonts/poppins-600.woff2', ['fonts/poppins-600.woff2', 'font/woff2']],
+  ['/client/fonts/poppins-700.woff2', ['fonts/poppins-700.woff2', 'font/woff2']],
 ]);
 const reply = (res, status, body) => {
   res.writeHead(status, { 'Content-Type': 'application/json' });
@@ -55,7 +63,8 @@ export function createGateway(client) {
           return reply(res, 400, { error: { code: 'INVALID_REQUEST' } });
         }
       } else if (kind === 'getRound') {
-        payload = { roundId: decodeURIComponent(url.pathname.slice(8)) };
+        try { payload = { roundId: decodeURIComponent(url.pathname.slice(8)) }; }
+        catch { return reply(res, 404, { error: { code: 'ROUND_NOT_FOUND' } }); } // malformed %-escape
       } else if (kind === 'listEvents') {
         const after = url.searchParams.get('after') ?? '0';
         const limit = url.searchParams.get('limit') ?? '100';
@@ -66,7 +75,8 @@ export function createGateway(client) {
         payload = { after: Number(after), limit: Number(limit) };
       }
       const result = await invoke(kind, payload);
-      if (kind === 'listEvents') result.events ??= [];
+      // proto3 omits zero-valued fields on the wire; restore the contract shape.
+      if (kind === 'listEvents') { result.events ??= []; result.nextCursor ??= payload.after; }
       reply(res, kind === 'startRound' ? 202 : 200, result);
     } catch (error) {
       const status = new Map([

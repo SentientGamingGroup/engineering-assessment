@@ -2,26 +2,54 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Beacon Relay — Sentient assessment</title>
+  <title>Beacon Relay</title>
+  <link rel="icon" href="/client/icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/client/style.css">
 </head>
 <body>
   <main>
-    <header><span class="brand">SENTIENT / ENGINEERING ASSESSMENT</span><span id="connection">Connecting</span></header>
-    <h1>Beacon Relay</h1><p>Choose a beacon. Follow the pulse. Reveal the signal.</p>
+    <header>
+      <h1 class="brand">Beacon Relay <em>Sentient assessment</em></h1>
+      <span id="connection">Connecting</span>
+    </header>
+    <p class="tagline">Choose a beacon. Follow the pulse. Reveal the signal.</p>
+    <details class="howto">
+      <summary>How to play</summary>
+      <ol>
+        <li>Pick one of the three beacons — click it, or Tab to it and press Enter.</li>
+        <li>Press <b>Play</b>. The relay charges while the server runs the round, then the pulse flies to the beacon the server selected.</li>
+        <li>If it lands on your beacon, you score <b>+1</b>. The result always comes from the server — the pulse only reports it.</li>
+      </ol>
+      <p>
+        <b>Pause</b> freezes the presentation only; the round keeps running.
+        <b>Skip</b> reveals the result as soon as it is ready.
+        <b>Replay</b> re-watches your last result without playing a new round.
+        <b>New round</b> returns to selection — your score stays.
+        Refreshing or losing connection never loses a round in progress.
+      </p>
+    </details>
     <section class="stage" aria-label="Beacon stage">
-      <div class="orbit"></div><div class="pulse" aria-hidden="true"></div>
-      <button class="beacon blue" data-choice="0" aria-pressed="true">01<span>Azure</span></button>
-      <button class="beacon gold" data-choice="1" aria-pressed="false">02<span>Amber</span></button>
-      <button class="beacon violet" data-choice="2" aria-pressed="false">03<span>Violet</span></button>
+      <canvas class="grid-bg" aria-hidden="true"></canvas>
+      <div class="orbit" aria-hidden="true"></div>
+      <div class="pulse" aria-hidden="true"></div>
+      <button class="beacon blue" data-choice="0" aria-pressed="true"><b>01</b><span>Azure</span></button>
+      <button class="beacon gold" data-choice="1" aria-pressed="false"><b>02</b><span>Amber</span></button>
+      <button class="beacon violet" data-choice="2" aria-pressed="false"><b>03</b><span>Violet</span></button>
+      <p id="result" role="status">Loading…</p>
     </section>
     <div class="controls">
-      <button id="play">Play</button><button id="pause" disabled>Pause</button>
-      <button id="skip" disabled>Skip</button><button id="replay" disabled>Replay</button>
-      <button id="new" disabled>New Round</button>
+      <button id="play">Play</button>
+      <button id="pause" disabled>Pause</button>
+      <button id="skip" disabled>Skip</button>
+      <button id="replay" disabled>Replay</button>
+      <button id="new" disabled>New round</button>
     </div>
-    <p id="result" role="status">Starter: implement round state, controls and animation.</p>
-    <footer>Demo score: <strong id="score">0</strong><span>No money or accounts</span></footer>
-  </main><script type="module" src="/client/app.mjs"></script>
+    <footer>
+      <span class="chip">Score <strong id="score">0</strong></span>
+      <span id="player" class="chip subtle"></span>
+      <span class="note">Synthetic demo — no money or accounts</span>
+    </footer>
+  </main>
+  <script type="module" src="/client/app.mjs"></script>
 </body>
 </html>

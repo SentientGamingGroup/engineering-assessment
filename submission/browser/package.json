@@ -1,0 +1,9 @@
+{
+  "name": "beacon-relay-browser-pass",
+  "private": true,
+  "type": "module",
+  "description": "Optional browser evidence harness; not needed to run or test the game.",
+  "devDependencies": {
+    "playwright-core": "1.47.2"
+  }
+}

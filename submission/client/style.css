@@ -1,14 +1,165 @@
-:root{color-scheme:dark;font:16px system-ui,sans-serif;background:#10131d;color:#e6ecfa}
-*{box-sizing:border-box}body{margin:0;padding:28px;min-height:100vh}
-main{max-width:960px;margin:0 auto}header,footer{display:flex;justify-content:space-between;gap:16px}
-header{font-size:12px;letter-spacing:.06em;color:#aabbd4}.brand{color:#62d3c0}
-h1{font-size:clamp(32px,5vw,54px);margin:36px 0 8px}p{color:#b0bfd5}
-.stage{height:330px;position:relative;border:1px solid #303b52;border-radius:20px;margin:28px 0;overflow:hidden;background:radial-gradient(ellipse at center,#243047,#141924 70%)}
-.orbit{position:absolute;inset:20% 12%;border:1px dashed #49617d;border-radius:50%}
-.beacon{position:absolute;top:41%;width:86px;height:86px;border-radius:50%;padding:8px;color:#e9f1ff;font-size:22px;background:#152233;border:2px solid var(--accent)}
-.beacon span{display:block;font-size:12px;margin-top:4px}.blue{--accent:#5dc8ff;left:12%}.gold{--accent:#ffcf68;left:calc(50% - 43px)}.violet{--accent:#b896ff;right:12%}
-.beacon[aria-pressed=true]{box-shadow:0 0 0 5px #ffffff1a}.pulse{position:absolute;left:calc(50% - 8px);top:18%;width:16px;height:16px;border-radius:50%;background:#72eed8;box-shadow:0 0 20px #72eed8}
-.controls{display:flex;flex-wrap:wrap;gap:10px}button{font:inherit;color:inherit;background:#202c40;border:1px solid #40536e;border-radius:8px;padding:10px 16px;cursor:pointer}
-#play{background:#67dcc3;color:#10241f;border-color:#67dcc3}button:disabled{opacity:.4;cursor:default}button:focus-visible{outline:3px solid #fff;outline-offset:4px}
-footer{margin-top:30px;font-size:14px;color:#8ea2bd}footer span{font-size:12px}
-@media(max-width:500px){body{padding:18px}.stage{height:300px}.beacon{width:68px;height:68px;font-size:18px}.blue{left:5%}.gold{left:calc(50% - 34px)}.violet{right:5%}header{flex-wrap:wrap}footer{flex-wrap:wrap}}
+/* Beacon Relay — game UI. Poppins self-hosted (no runtime network deps). */
+@font-face{font-family:Poppins;font-style:normal;font-weight:400;font-display:swap;src:url(/client/fonts/poppins-400.woff2) format('woff2')}
+@font-face{font-family:Poppins;font-style:normal;font-weight:500;font-display:swap;src:url(/client/fonts/poppins-500.woff2) format('woff2')}
+@font-face{font-family:Poppins;font-style:normal;font-weight:600;font-display:swap;src:url(/client/fonts/poppins-600.woff2) format('woff2')}
+@font-face{font-family:Poppins;font-style:normal;font-weight:700;font-display:swap;src:url(/client/fonts/poppins-700.woff2) format('woff2')}
+
+:root{
+  color-scheme:dark;
+  --bg:#070b14;--panel:#0c1322;--line:#1b2640;--text:#eef3ff;--muted:#8fa2c4;
+  --primary:#53e0c4;--primary-ink:#06231c;
+  --azure:#5bc8ff;--amber:#ffc95c;--violet:#b894ff;
+  --good:#6ef0a8;--bad:#ff8b8b;
+  font:15px/1.55 Poppins,system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;min-height:100vh;color:var(--text);
+  background:
+    radial-gradient(900px 500px at 70% -10%,#13203c 0%,transparent 60%),
+    radial-gradient(700px 420px at 10% 110%,#101a31 0%,transparent 60%),
+    var(--bg);
+  padding:26px;
+  display:flex; /* margin:auto on main centers it both ways, and degrades to
+                   normal scrolling when content is taller than the viewport */
+}
+main{max-width:880px;width:100%;margin:auto}
+
+/* header */
+header{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{font-size:17px;font-weight:700;letter-spacing:.01em;margin:0}
+.brand em{display:block;font-style:normal;font-weight:500;font-size:11px;color:var(--muted)}
+#connection{font-size:12px;font-weight:600;padding:5px 12px;border-radius:999px;border:1px solid var(--line);color:var(--muted);transition:color .3s,border-color .3s}
+#connection[data-state=connected]{color:var(--primary);border-color:#2a5a50}
+#connection[data-state=connecting],#connection[data-state=reconnecting]{color:var(--amber);border-color:#5a4a2a}
+.tagline{color:var(--muted);font-size:13px;margin:10px 0 12px}
+
+/* how to play */
+.howto{margin:0 0 14px;border:1px solid var(--line);border-radius:14px;background:#0a111fb0;font-size:13px;color:var(--muted)}
+.howto summary{cursor:pointer;list-style:none;padding:9px 16px;font-weight:600;font-size:12px;color:#cdd9ee;display:flex;align-items:center;gap:8px}
+.howto summary::before{content:'';width:7px;height:7px;border-right:2px solid var(--primary);border-bottom:2px solid var(--primary);transform:rotate(-45deg);transition:transform .2s}
+.howto[open] summary::before{transform:rotate(45deg)}
+.howto summary::-webkit-details-marker{display:none}
+.howto summary:focus-visible{outline:2px solid var(--text);outline-offset:-2px;border-radius:14px}
+.howto ol,.howto p{margin:0;padding:0 18px 12px 34px;line-height:1.7}
+.howto p{padding-left:18px}
+.howto li{margin-bottom:4px}
+.howto b{color:var(--text);font-weight:600}
+
+/* stage */
+.stage{
+  /* clip, not just hide: focus must never scroll the stage's contents */
+  position:relative;height:400px;overflow:hidden;overflow:clip;border-radius:22px;
+  border:1px solid var(--line);
+  background:radial-gradient(ellipse at 50% 42%,#1a2742 0%,#0b1322 68%);
+}
+.grid-bg{
+  /* CSS size pinned to the stage; the backing store is DPR-scaled in fx.mjs */
+  position:absolute;inset:0;width:100%;height:100%;pointer-events:none;
+  -webkit-mask-image:radial-gradient(ellipse at 50% 45%,#000 25%,transparent 78%);
+  mask-image:radial-gradient(ellipse at 50% 45%,#000 25%,transparent 78%);
+}
+.orbit{position:absolute;inset:19% 10%;border:1px dashed #3b5377;border-radius:50%;opacity:.55;animation:orbit 60s linear infinite}
+@keyframes orbit{to{transform:rotate(360deg)}}
+
+/* pulse */
+.pulse{
+  position:absolute;left:calc(50% - 9px);top:15%;width:18px;height:18px;border-radius:50%;
+  background:radial-gradient(circle at 38% 32%,#c9fff2,var(--primary) 60%);
+  box-shadow:0 0 14px var(--primary),0 0 42px #53e0c466,0 0 90px #53e0c42e;
+  animation:breathe 3.2s ease-in-out infinite;
+  transition:background .25s;
+}
+@keyframes breathe{0%,100%{box-shadow:0 0 14px var(--primary),0 0 42px #53e0c466,0 0 90px #53e0c42e}50%{box-shadow:0 0 18px var(--primary),0 0 56px #53e0c48a,0 0 110px #53e0c43d}}
+.stage[data-phase=pending] .pulse{animation:charge 1s ease-in-out infinite alternate}
+@keyframes charge{from{transform:scale(.72);opacity:.5}to{transform:scale(1.35);opacity:1}}
+.stage.paused .pulse,.stage.paused .orbit,.stage.paused .beacon{animation-play-state:paused}
+.stage[data-phase=animating] .pulse,.stage[data-phase=revealed] .pulse{animation:none}
+.stage[data-result=match] .pulse{background:radial-gradient(circle at 38% 32%,#d7ffe9,var(--good) 60%)}
+.stage[data-result=miss] .pulse{background:radial-gradient(circle at 38% 32%,#ffe3e3,var(--bad) 60%)}
+
+/* beacons */
+.beacon{
+  position:absolute;top:40%;width:96px;height:96px;border-radius:50%;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
+  font:inherit;color:var(--text);
+  background:radial-gradient(circle at 50% 36%,#1b2a45,#101a30 72%);
+  border:2px solid color-mix(in srgb,var(--accent) 55%,transparent);
+  box-shadow:inset 0 0 22px #0007,0 0 0 0 transparent;
+  transition:transform .25s,border-color .25s,box-shadow .25s,opacity .25s;
+  animation:float 5s ease-in-out infinite;
+}
+.beacon b{font-size:19px;font-weight:600;letter-spacing:.04em}
+.beacon span{font-size:11px;font-weight:500;color:var(--muted);transition:color .25s}
+.blue{--accent:var(--azure);left:11%}
+.gold{--accent:var(--amber);left:calc(50% - 48px);animation-delay:-1.7s}
+.violet{--accent:var(--violet);right:11%;animation-delay:-3.4s}
+@keyframes float{0%,100%{margin-top:0}50%{margin-top:-7px}}
+.beacon:hover:not(:disabled){transform:scale(1.04);border-color:var(--accent)}
+.beacon[aria-pressed=true]{
+  border-color:var(--accent);transform:scale(1.07);
+  box-shadow:inset 0 0 22px #0007,0 0 24px color-mix(in srgb,var(--accent) 45%,transparent),0 0 0 5px color-mix(in srgb,var(--accent) 18%,transparent);
+}
+.beacon[aria-pressed=true] span{color:var(--accent)}
+.beacon:disabled{cursor:default;opacity:.8}
+.beacon.lit{
+  border-color:var(--accent);
+  box-shadow:inset 0 0 26px color-mix(in srgb,var(--accent) 30%,#0007),0 0 34px color-mix(in srgb,var(--accent) 60%,transparent),0 0 0 7px color-mix(in srgb,var(--accent) 20%,transparent);
+}
+.stage[data-result] .beacon.lit::after{
+  content:'';position:absolute;inset:-7px;border-radius:50%;pointer-events:none;
+  border:2px solid var(--accent);animation:burst .8s ease-out forwards;
+}
+.stage[data-result=miss] .beacon.lit::after{border-color:var(--bad)}
+@keyframes burst{from{transform:scale(.9);opacity:.9}to{transform:scale(2.1);opacity:0}}
+
+/* result line lives inside the stage, game-HUD style */
+#result{
+  position:absolute;left:50%;bottom:14px;transform:translateX(-50%);
+  width:max-content;max-width:92%;margin:0;text-align:center;
+  font-size:13px;font-weight:500;color:var(--muted);
+  padding:7px 16px;border-radius:999px;border:1px solid var(--line);
+  background:#0a111fd9;backdrop-filter:blur(6px);
+}
+.stage[data-result=match] #result{color:var(--good);border-color:#2b5a41}
+.stage[data-result=miss] #result{color:var(--bad);border-color:#5a2f2f}
+
+/* controls — one primary, the rest quiet */
+.controls{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:20px 0 6px}
+button{font:inherit;font-weight:500;cursor:pointer;border-radius:12px;padding:10px 22px;transition:transform .15s,background .2s,border-color .2s,opacity .2s}
+.controls button{background:transparent;border:1px solid #2a3a5c;color:#cdd9ee}
+.controls button:hover:not(:disabled){border-color:#3c5a8a;color:var(--text);transform:translateY(-1px)}
+#play{background:var(--primary);border-color:var(--primary);color:var(--primary-ink);font-weight:600;padding:10px 34px}
+#play:hover:not(:disabled){background:#6ae8cf;transform:translateY(-1px)}
+button:disabled{opacity:.22;cursor:default;transform:none}
+button:focus-visible,.beacon:focus-visible{outline:2px solid var(--text);outline-offset:3px}
+
+/* footer HUD */
+footer{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:14px;font-size:12px}
+.chip{padding:5px 14px;border-radius:999px;border:1px solid var(--line);color:var(--muted);font-weight:500}
+.chip strong{color:var(--text);font-weight:700;font-size:14px;margin-left:4px;display:inline-block}
+.chip.subtle{opacity:.7}
+.note{color:#5d6f90}
+#score.pop{animation:pop .45s ease-out}
+@keyframes pop{30%{transform:scale(1.55);color:var(--good)}}
+
+/* responsive */
+@media(max-width:520px){
+  body{padding:16px}
+  .stage{height:340px}
+  .beacon{width:74px;height:74px}
+  .beacon b{font-size:16px}
+  .blue{left:5%}.gold{left:calc(50% - 37px)}.violet{right:5%}
+  header{flex-wrap:wrap}
+  #result{font-size:12px}
+}
+
+/* reduced motion: no ambient loops, same outcomes */
+@media (prefers-reduced-motion: reduce){
+  .orbit,.beacon{animation:none}
+  .pulse{animation:none;transition:none}
+  .stage[data-phase=pending] .pulse{animation:none;opacity:.85}
+  .stage[data-result] .beacon.lit::after{animation:none;opacity:0}
+  button,.beacon{transition:none}
+  #score.pop{animation:none}
+}
