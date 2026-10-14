@@ -1,0 +1,3 @@
+# Third-party and generated code: GitHub collapses these in diffs and language stats.
+vendor/** linguist-generated
+roundspb/*.pb.go linguist-generated

@@ -1,0 +1,17 @@
+{
+  // Editor/type-check only: nothing is compiled. The gateway strips types at
+  // serve time, so only erasable TypeScript syntax is allowed (no enum,
+  // namespace or constructor parameter properties).
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "strict": true,
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "erasableSyntaxOnly": true,
+    "verbatimModuleSyntax": true
+  },
+  "include": ["*.ts"]
+}
