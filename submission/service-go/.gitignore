@@ -1,0 +1,24 @@
+# Go build/debug artifacts. go.sum, roundspb/ (generated bindings) and vendor/
+# (`go mod vendor`) are committed, so builds need neither protoc nor network.
+# The service binary goes to submission/build/, ignored by the root .gitignore.
+
+# Delve / VS Code Go debug binaries
+__debug_bin*
+
+# Stray `go build` output from inside this directory
+/service
+/beacon-service
+*.exe
+
+# Test and profiling output
+*.test
+*.out
+*.prof
+coverage.*
+
+# Local workspace files
+go.work
+go.work.sum
+
+# Data from running the service from this directory
+/data/
