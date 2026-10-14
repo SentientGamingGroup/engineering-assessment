@@ -12,3 +12,10 @@ h1{font-size:clamp(32px,5vw,54px);margin:36px 0 8px}p{color:#b0bfd5}
 #play{background:#67dcc3;color:#10241f;border-color:#67dcc3}button:disabled{opacity:.4;cursor:default}button:focus-visible{outline:3px solid #fff;outline-offset:4px}
 footer{margin-top:30px;font-size:14px;color:#8ea2bd}footer span{font-size:12px}
 @media(max-width:500px){body{padding:18px}.stage{height:300px}.beacon{width:68px;height:68px;font-size:18px}.blue{left:5%}.gold{left:calc(50% - 34px)}.violet{right:5%}header{flex-wrap:wrap}footer{flex-wrap:wrap}}
+#fx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2}
+.beacon{z-index:1;transition:box-shadow .3s,transform .3s}.beacon:disabled{opacity:1;cursor:default}
+.beacon[data-outcome=match]{box-shadow:0 0 0 6px #72eed855,0 0 30px #72eed8}.beacon[data-outcome=miss]{box-shadow:0 0 0 6px #ff7a8a55}
+.beacon[aria-pressed=true]{transform:scale(1.08)}
+#connection[data-state=ok]{color:#72eed8}#connection[data-state=down]{color:#ff9a6a}
+.hint{font-size:13px;color:#8ea2bd}
+@media(prefers-reduced-motion:reduce){.beacon{transition:none}}
