@@ -1,14 +1,113 @@
-:root{color-scheme:dark;font:16px system-ui,sans-serif;background:#10131d;color:#e6ecfa}
-*{box-sizing:border-box}body{margin:0;padding:28px;min-height:100vh}
-main{max-width:960px;margin:0 auto}header,footer{display:flex;justify-content:space-between;gap:16px}
-header{font-size:12px;letter-spacing:.06em;color:#aabbd4}.brand{color:#62d3c0}
-h1{font-size:clamp(32px,5vw,54px);margin:36px 0 8px}p{color:#b0bfd5}
-.stage{height:330px;position:relative;border:1px solid #303b52;border-radius:20px;margin:28px 0;overflow:hidden;background:radial-gradient(ellipse at center,#243047,#141924 70%)}
-.orbit{position:absolute;inset:20% 12%;border:1px dashed #49617d;border-radius:50%}
-.beacon{position:absolute;top:41%;width:86px;height:86px;border-radius:50%;padding:8px;color:#e9f1ff;font-size:22px;background:#152233;border:2px solid var(--accent)}
-.beacon span{display:block;font-size:12px;margin-top:4px}.blue{--accent:#5dc8ff;left:12%}.gold{--accent:#ffcf68;left:calc(50% - 43px)}.violet{--accent:#b896ff;right:12%}
-.beacon[aria-pressed=true]{box-shadow:0 0 0 5px #ffffff1a}.pulse{position:absolute;left:calc(50% - 8px);top:18%;width:16px;height:16px;border-radius:50%;background:#72eed8;box-shadow:0 0 20px #72eed8}
-.controls{display:flex;flex-wrap:wrap;gap:10px}button{font:inherit;color:inherit;background:#202c40;border:1px solid #40536e;border-radius:8px;padding:10px 16px;cursor:pointer}
-#play{background:#67dcc3;color:#10241f;border-color:#67dcc3}button:disabled{opacity:.4;cursor:default}button:focus-visible{outline:3px solid #fff;outline-offset:4px}
-footer{margin-top:30px;font-size:14px;color:#8ea2bd}footer span{font-size:12px}
-@media(max-width:500px){body{padding:18px}.stage{height:300px}.beacon{width:68px;height:68px;font-size:18px}.blue{left:5%}.gold{left:calc(50% - 34px)}.violet{right:5%}header{flex-wrap:wrap}footer{flex-wrap:wrap}}
+:root{color-scheme:dark;font:16px system-ui,-apple-system,"Segoe UI",sans-serif;color:#e6ecfa;background:#070a14;
+  --hit:#5ff5a6;--miss:#ff6b81;--pulse:#7ff7e3;--ink:#0b1020;--panel:#121a2e;--line:#2a3756;--muted:#8fa3c4;--orb:84px}
+*{box-sizing:border-box}
+body{margin:0;padding:20px 24px;min-height:100vh;background:radial-gradient(1200px 600px at 50% -10%,#1b2450 0%,#0a0f1f 55%,#070a14 100%) fixed}
+main{max-width:980px;margin:0 auto}
+header,footer{display:flex;justify-content:space-between;align-items:center;gap:16px}
+header{font-size:12px;letter-spacing:.08em;color:var(--muted)}.brand{color:#62d3c0}
+.conn{padding:4px 10px;border:1px solid var(--line);border-radius:999px;background:#0e1527}
+.conn::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;background:#8a96aa;vertical-align:0}
+.conn[data-state=live]::before{background:var(--hit);box-shadow:0 0 8px var(--hit)}
+.conn[data-state=reconnecting]::before{background:#ffcf68;box-shadow:0 0 8px #ffcf68}
+
+.titlebar{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin:18px 0 14px;flex-wrap:wrap}
+h1{margin:0;font-size:clamp(30px,5vw,48px);letter-spacing:.02em;font-weight:800;
+  background:linear-gradient(90deg,#7ff7e3,#8fb4ff 50%,#c9a2ff);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 18px #6fd6ff40)}
+.tagline{margin:6px 0 0;color:var(--muted)}
+.hud{display:flex;gap:10px;margin:0}
+.hud div{min-width:78px;padding:8px 12px;border:1px solid var(--line);border-radius:12px;background:linear-gradient(#141d35,#0e1529);text-align:center}
+.hud dt{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.hud dd{margin:2px 0 0;font-size:24px;font-weight:800;font-variant-numeric:tabular-nums}
+.hud dd.bump{animation:bump .5s ease-out}
+@keyframes bump{0%{transform:scale(1)}35%{transform:scale(1.35);color:var(--hit)}100%{transform:scale(1)}}
+
+/* Loader: covers the page until the client has laid out, restored state and connected,
+   so a reload never flashes unpositioned beacons or default numbers. */
+.loader{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+  background:radial-gradient(1200px 600px at 50% -10%,#1b2450 0%,#0a0f1f 55%,#070a14 100%);color:var(--muted);font-size:14px;letter-spacing:.08em;
+  transition:opacity .35s ease,visibility .35s}
+.loader p{margin:0}
+.loader-ring{width:56px;height:56px;border-radius:50%;border:3px solid #2a3756;border-top-color:#7ff7e3;box-shadow:0 0 24px -6px #7ff7e3;animation:spin-ring .9s linear infinite}
+body.loading main{visibility:hidden}
+body.loading main *{transition:none!important} /* no animated jump from default to restored state */
+body:not(.loading) .loader{opacity:0;visibility:hidden;pointer-events:none}
+
+/* Stage: geometry (--cx, --cy, --r in px) is set from JS so the orbit is always a true circle. */
+.stage{--cx:300;--cy:180;--r:130;position:relative;height:clamp(330px,56vh,470px);border:1px solid var(--line);border-radius:22px;overflow:hidden;
+  background:radial-gradient(circle at 50% 50%,#1d2a52 0%,#10172e 45%,#090d1b 100%);box-shadow:inset 0 0 80px #000a,0 20px 60px -30px #4f7dff55;touch-action:manipulation}
+.stars{position:absolute;inset:0;opacity:.7;background-image:
+  radial-gradient(1px 1px at 12% 22%,#fff9,transparent),radial-gradient(1px 1px at 78% 14%,#fff8,transparent),
+  radial-gradient(1.5px 1.5px at 30% 80%,#fffa,transparent),radial-gradient(1px 1px at 88% 66%,#fff7,transparent),
+  radial-gradient(1px 1px at 55% 8%,#fff6,transparent),radial-gradient(1.5px 1.5px at 6% 58%,#fff8,transparent),
+  radial-gradient(1px 1px at 66% 90%,#fff6,transparent),radial-gradient(1px 1px at 94% 36%,#fff8,transparent),
+  radial-gradient(1px 1px at 42% 34%,#fff5,transparent),radial-gradient(1px 1px at 20% 46%,#fff5,transparent)}
+.orbit,.orbit-ticks,.core{position:absolute;left:calc(var(--cx) * 1px);top:calc(var(--cy) * 1px);border-radius:50%;pointer-events:none;box-sizing:border-box}
+/* Centered with negative margins (not translate) so the spin animation can own transform. */
+.orbit{width:calc(var(--r) * 2px);height:calc(var(--r) * 2px);margin:calc(var(--r) * -1px) 0 0 calc(var(--r) * -1px);border:2px solid #3f5f95;box-shadow:0 0 24px #4f8dff33,inset 0 0 24px #4f8dff22;transition:border-color .4s,box-shadow .4s}
+.orbit-ticks{width:calc(var(--r) * 2px - 22px);height:calc(var(--r) * 2px - 22px);margin:calc(var(--r) * -1px + 11px) 0 0 calc(var(--r) * -1px + 11px);border:2px dotted #4a6aa055;animation:spin 40s linear infinite}
+.stage:is([data-phase=starting],[data-phase=playing],[data-phase=replaying]) .orbit{border-color:#6fb6ff;box-shadow:0 0 34px #4fc3ff55,inset 0 0 30px #4fc3ff33}
+.stage:is([data-phase=starting],[data-phase=playing],[data-phase=replaying]) .orbit-ticks{animation-duration:8s}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.core{width:calc(var(--r) * 1.15px);height:calc(var(--r) * 1.15px);margin:calc(var(--r) * -0.575px) 0 0 calc(var(--r) * -0.575px);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+  background:radial-gradient(circle,#24366a 0%,#162244 55%,transparent 72%)}
+.core-title{font-size:clamp(14px,2.4vw,20px);font-weight:800;letter-spacing:.12em;color:#dfe8ff;will-change:transform,opacity}
+.core-sub{margin-top:4px;font-size:12px;letter-spacing:.06em;color:var(--muted)}
+.stage.hit .core-title{color:var(--hit);text-shadow:0 0 18px var(--hit);font-size:clamp(22px,4vw,34px)}
+.stage.miss .core-title{color:var(--miss);text-shadow:0 0 18px var(--miss);font-size:clamp(22px,4vw,34px)}
+
+/* Beacons: perfect-circle orbs placed on the orbit by JS (left/top = centre). */
+.beacon{position:absolute;z-index:1;left:0;top:0;width:var(--orb);height:var(--orb);padding:0;border-radius:50%;transform:translate(-50%,-50%);
+  border:2px solid var(--accent);color:#fff;cursor:pointer;
+  background:radial-gradient(circle at 35% 30%,color-mix(in srgb,var(--accent) 55%,#fff 10%) 0%,color-mix(in srgb,var(--accent) 35%,#0b1020) 45%,#0b1020 100%);
+  box-shadow:0 0 18px -4px var(--accent),inset 0 -8px 18px #0008;transition:box-shadow .3s,filter .3s,opacity .3s}
+.beacon .num{display:block;font-size:22px;font-weight:800;line-height:1;text-shadow:0 1px 4px #0009}
+.beacon .name{position:absolute;left:50%;top:calc(100% + 8px);transform:translateX(-50%);font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);white-space:nowrap}
+.blue{--accent:#5dc8ff}.gold{--accent:#ffcf68}.violet{--accent:#c39bff}
+.beacon::before{content:"";position:absolute;inset:-9px;border-radius:50%;border:2px dashed var(--accent);opacity:0;transition:opacity .25s}
+.beacon[aria-checked=true]::before{opacity:.9;animation:spin-ring 6s linear infinite}
+.beacon[aria-checked=true]{box-shadow:0 0 34px -2px var(--accent),inset 0 -8px 18px #0008}
+@keyframes spin-ring{to{transform:rotate(360deg)}}
+.stage[data-phase=idle] .beacon:hover{filter:brightness(1.25)}
+.beacon[aria-disabled=true]{cursor:default}
+.stage:is([data-phase=starting],[data-phase=playing],[data-phase=replaying]) .beacon[aria-checked=false]{opacity:.7}
+.beacon.target{box-shadow:0 0 0 4px var(--accent),0 0 60px 6px var(--accent);filter:brightness(1.3);opacity:1!important}
+.stage.miss .beacon.chosen:not(.target){border-color:var(--miss);filter:saturate(.5) brightness(.8)}
+.beacon.chosen .name::after{content:"your pick";display:block;margin-top:2px;font-size:10px;color:var(--muted)}
+
+/* Pulse + comet trail + effects (positioned with translate3d each frame). */
+.pulse,.trail,.spark,.ring{position:absolute;left:0;top:0;border-radius:50%;opacity:0;pointer-events:none;will-change:transform,opacity;z-index:2}
+.pulse{width:22px;height:22px;margin:-11px 0 0 -11px;background:radial-gradient(circle,#fff 0%,var(--pulse) 45%,#2fd3c0 100%);box-shadow:0 0 18px 4px var(--pulse),0 0 50px 10px #2fd3c066}
+.trail{width:14px;height:14px;margin:-7px 0 0 -7px;background:var(--pulse);box-shadow:0 0 10px var(--pulse)}
+.ring{width:140px;height:140px;margin:-70px 0 0 -70px;border:3px solid var(--hit);box-shadow:0 0 24px var(--hit)}
+.stage.miss .ring{border-color:var(--miss);border-style:dashed;box-shadow:0 0 24px var(--miss)}
+.spark{width:9px;height:9px;margin:-4.5px 0 0 -4.5px;background:var(--c,#fff);box-shadow:0 0 10px var(--c,#fff)}
+.stage-note{position:absolute;left:0;right:0;bottom:12px;margin:0;text-align:center;font-size:13px;letter-spacing:.04em;color:#ffd98a;z-index:3}
+
+.controls{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+button{font:inherit;color:inherit}
+.controls button{background:linear-gradient(#1d2944,#16203a);border:1px solid #3a4d74;border-radius:12px;padding:11px 18px;font-weight:600;cursor:pointer;transition:transform .12s,filter .2s,opacity .2s}
+.controls button:not(:disabled):hover{filter:brightness(1.2)}
+.controls button:not(:disabled):active{transform:translateY(1px) scale(.98)}
+.controls .primary{min-width:150px;font-size:18px;letter-spacing:.12em;text-transform:uppercase;color:#062a24;border-color:#7ff7e3;
+  background:linear-gradient(180deg,#9dfbe9,#3fdcc2);box-shadow:0 0 24px -4px #5ff5d4,inset 0 -3px 0 #0003}
+.controls .primary:not(:disabled){animation:glow 2.2s ease-in-out infinite}
+@keyframes glow{50%{box-shadow:0 0 34px 2px #5ff5d4,inset 0 -3px 0 #0003}}
+.controls button:disabled{opacity:.35;cursor:default;animation:none}
+.controls .primary:disabled{background:#1a2440;color:#8fa3c4;border-color:#3a4d74;box-shadow:none;opacity:.5}
+button:focus-visible{outline:3px solid #fff;outline-offset:4px}
+#result{min-height:1.5em;margin:14px 0 6px;font-size:18px;font-weight:600}
+#result.hit{color:var(--hit)}#result.miss{color:var(--miss)}
+footer{margin-top:14px;font-size:12px;color:var(--muted);flex-wrap:wrap}footer small{margin-left:6px;opacity:.7}
+
+@media(max-width:560px){
+  body{padding:14px 16px}:root{--orb:62px}
+  .titlebar{margin:12px 0 10px}.tagline{font-size:14px}
+  .hud{width:100%}.hud div{flex:1;min-width:0;padding:6px}.hud dd{font-size:20px}
+  .stage{height:360px}.beacon .num{font-size:17px}.beacon .name{font-size:10px}
+  .controls button{flex:1 1 28%;padding:11px 8px}.controls .primary{flex-basis:100%}
+}
+@media(prefers-reduced-motion:reduce){
+  .loader-ring{animation:none;border-color:#7ff7e3}
+  .orbit-ticks,.beacon[aria-checked=true]::before,.controls .primary:not(:disabled),.hud dd.bump{animation:none}
+  .beacon,.orbit,.controls button{transition:none}
+}

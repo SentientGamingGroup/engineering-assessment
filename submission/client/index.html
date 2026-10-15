@@ -4,24 +4,55 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Beacon Relay — Sentient assessment</title>
   <link rel="stylesheet" href="/client/style.css">
+  <noscript><style>body.loading main{visibility:visible}.loader{display:none}</style></noscript>
 </head>
-<body>
-  <main>
-    <header><span class="brand">SENTIENT / ENGINEERING ASSESSMENT</span><span id="connection">Connecting</span></header>
-    <h1>Beacon Relay</h1><p>Choose a beacon. Follow the pulse. Reveal the signal.</p>
-    <section class="stage" aria-label="Beacon stage">
-      <div class="orbit"></div><div class="pulse" aria-hidden="true"></div>
-      <button class="beacon blue" data-choice="0" aria-pressed="true">01<span>Azure</span></button>
-      <button class="beacon gold" data-choice="1" aria-pressed="false">02<span>Amber</span></button>
-      <button class="beacon violet" data-choice="2" aria-pressed="false">03<span>Violet</span></button>
-    </section>
-    <div class="controls">
-      <button id="play">Play</button><button id="pause" disabled>Pause</button>
-      <button id="skip" disabled>Skip</button><button id="replay" disabled>Replay</button>
-      <button id="new" disabled>New Round</button>
+<body class="loading">
+  <div class="loader" id="loader" role="status" aria-live="polite">
+    <div class="loader-ring" aria-hidden="true"></div>
+    <p>Loading Beacon Relay…</p>
+  </div>
+  <main aria-busy="true">
+    <header>
+      <span class="brand">SENTIENT / ENGINEERING ASSESSMENT</span>
+      <span id="connection" class="conn" data-state="connecting" role="status">Connecting…</span>
+    </header>
+    <div class="titlebar">
+      <div>
+        <h1>Beacon Relay</h1>
+        <p class="tagline">Pick a beacon. Launch the pulse. Will it land on yours?</p>
+      </div>
+      <dl class="hud" aria-label="Your stats">
+        <div><dt>Score</dt><dd id="score">0</dd></div>
+        <div><dt>Rounds</dt><dd id="rounds">0</dd></div>
+        <div><dt>Streak</dt><dd id="streak">0</dd></div>
+      </dl>
     </div>
-    <p id="result" role="status">Starter: implement round state, controls and animation.</p>
-    <footer>Demo score: <strong id="score">0</strong><span>No money or accounts</span></footer>
+    <section class="stage" id="stage" aria-label="Beacon stage" data-phase="idle">
+      <div class="stars" aria-hidden="true"></div>
+      <div class="orbit" aria-hidden="true"></div>
+      <div class="orbit-ticks" aria-hidden="true"></div>
+      <div class="core" aria-hidden="true"><span class="core-title" id="core-title">PICK A BEACON</span><span class="core-sub" id="core-sub">then press Play</span></div>
+      <div class="fx" aria-hidden="true"></div>
+      <div class="pulse" aria-hidden="true"></div>
+      <div class="beacons" role="radiogroup" aria-label="Choose a beacon">
+        <button class="beacon blue" data-choice="0" role="radio" aria-checked="true" aria-label="Beacon 1, Azure"><span class="num">01</span><span class="name">Azure</span></button>
+        <button class="beacon gold" data-choice="1" role="radio" aria-checked="false" aria-label="Beacon 2, Amber" tabindex="-1"><span class="num">02</span><span class="name">Amber</span></button>
+        <button class="beacon violet" data-choice="2" role="radio" aria-checked="false" aria-label="Beacon 3, Violet" tabindex="-1"><span class="num">03</span><span class="name">Violet</span></button>
+      </div>
+      <p class="stage-note" id="stage-note" aria-hidden="true"></p>
+    </section>
+    <div class="controls" role="group" aria-label="Round controls">
+      <button id="play" class="primary" tabindex="0" aria-keyshortcuts="Enter">Play</button>
+      <button id="pause" tabindex="0" aria-keyshortcuts="P" disabled>Pause</button>
+      <button id="skip" tabindex="0" aria-keyshortcuts="S" disabled>Skip</button>
+      <button id="replay" tabindex="0" aria-keyshortcuts="R" disabled>Replay</button>
+      <button id="new" tabindex="0" aria-keyshortcuts="N" disabled>New Round</button>
+    </div>
+    <p id="result" role="status" aria-live="polite">Choose a beacon and press Play.</p>
+    <footer>
+      <span class="hint">Keys: ←/→ or 1–3 choose · Enter play · P pause · S skip · R replay · N new round</span>
+      <span>Demo points only · no money or accounts <small id="player"></small></span>
+    </footer>
   </main><script type="module" src="/client/app.mjs"></script>
 </body>
 </html>
