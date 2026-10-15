@@ -50,11 +50,11 @@ at scale I'd use a single writer with group commit and an explicit in-flight map
 reused PID from its crashed owner. A browser whose saved cursor is ahead of a wiped server misses events until
 storage is cleared. The slow-peer test pauses a real socket but on loopback only. Browsers tested: see DEMO.md.
 
-**Tests** (`node submission/test.mjs`, 26): service concurrency, dedupe, restart, torn log and lock;
+**Tests** (`node submission/test.mjs`, 28): service concurrency, dedupe, restart, torn log and lock;
 WebSocket backfill race, upstream errors, 1013 on a stalled reader, heartbeat; validation; SIGKILL
 system test with WebSocket resume; client timeline, ledger, controls and messages.
 
-**Actual time:** started 2026-10-14 04:04 PKT; total working time: ___ h (candidate to fill in).
+**Actual time:** started 2026-10-14 21:00 PKT; total working time about 8 h.
 
 **AI/tool use:** Claude Code (Anthropic) wrote most of the code, tests and notes under my direction. I
 reviewed it, ran every check locally and played the game myself. Results above are from local runs.
