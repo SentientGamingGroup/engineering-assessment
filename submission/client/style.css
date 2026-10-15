@@ -12,3 +12,10 @@ h1{font-size:clamp(32px,5vw,54px);margin:36px 0 8px}p{color:#b0bfd5}
 #play{background:#67dcc3;color:#10241f;border-color:#67dcc3}button:disabled{opacity:.4;cursor:default}button:focus-visible{outline:3px solid #fff;outline-offset:4px}
 footer{margin-top:30px;font-size:14px;color:#8ea2bd}footer span{font-size:12px}
 @media(max-width:500px){body{padding:18px}.stage{height:300px}.beacon{width:68px;height:68px;font-size:18px}.blue{left:5%}.gold{left:calc(50% - 34px)}.violet{right:5%}header{flex-wrap:wrap}footer{flex-wrap:wrap}}
+.pulse{top:0;left:0;will-change:transform}
+#connection[data-ok="1"]{color:#67dcc3}#connection[data-ok="0"]{color:#ffcf68}
+.stage[data-reveal=match]{border-color:#67dcc3;box-shadow:inset 0 0 60px #67dcc355}
+.stage[data-reveal=miss]{border-color:#ff8f8f;box-shadow:inset 0 0 60px #ff8f8f44}
+.beacon.is-target{box-shadow:0 0 0 5px #fff6,0 0 28px var(--accent)}
+#result{min-height:1.4em}
+@media(prefers-reduced-motion:reduce){.pulse{box-shadow:none}}
